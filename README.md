@@ -1,2 +1,4 @@
 # datamaker
-random data make library for problem solving
+random data making library for problem solving
+
+it is prototype
