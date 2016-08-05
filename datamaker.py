@@ -54,28 +54,3 @@ class GroupDataMaker(DataMaker):
             for i in range(num):
                 dataset.append([low,high,g])
         self.create(dataset)
-
-DT=DataType
-S=Sequence
-G=Graph
-BG=BipartiteGraph
-DM=DataMaker
-LDM=LinearDataMaker
-GDM=GroupDataMaker
-
-"""
-group=[
-    {
-        'nlow':1,
-        'nhigh':10,
-        'num':5
-    },
-    {
-        'nlow':10,
-        'nhigh':100,
-        'num':5
-    }
-]
-GDM(S,group)
-"""
-
