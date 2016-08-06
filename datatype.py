@@ -279,11 +279,11 @@ class Grid(DataType):
                     contain[ch[0]]+=1
                     self.element.append(ch[0])
             else:
-                while contain[ch]<1 and not ch in self.exclude:
+                while (not ch in contain or contain[ch]<1) and not ch in self.exclude:
                     if not ch in contain:
                         contain[ch] = 0
                     contain[ch]+=1
-                    self.element.append(ch)
+                    self.element.append(str(ch))
 
         self.grid=[["" for i in range(self.column)] for j in range(self.row)]
 

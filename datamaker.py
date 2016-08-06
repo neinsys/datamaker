@@ -39,7 +39,7 @@ class LinearDataMaker(DataMaker):
         self.start=option.get("start",0)
         dataset=[]
         for i in range(testcase):
-            dataset.append([self.start+self.interval*i,self.start+self.interval*(i+1),option])
+            dataset.append([self.start+self.interval*i,self.start+self.interval*(i+1)-1,option])
         self.create(dataset)
 
 class GroupDataMaker(DataMaker):
