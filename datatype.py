@@ -243,6 +243,7 @@ class Grid(DataType):
         self.exclude=option.get("exclude",set())
         self.unique=option.get("unique",set())
         self.atLeastOne=option.get("atLeastOne",set())
+        self.delimiter=option.get("delimiter",' ')
 
 
         contain={}
@@ -319,7 +320,7 @@ class Grid(DataType):
         ret+=str(self.row)+" "+str(self.column)+'\n'
         for r in self.grid:
             for c in r:
-                ret+=c+' '
+                ret+=c+self.delimiter
             ret+='\n'
         return ret
 
