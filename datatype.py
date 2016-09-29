@@ -1,5 +1,5 @@
-from random import randint
-from otherdatastructure import Edge,DisjointSet
+from random import randint,uniform,shuffle
+from otherdatastructure import Edge,DisjointSet,Point,QueryData
 import string
 from types import *
 class DataType:
@@ -32,6 +32,8 @@ class Sequence(DataType):
         self.elementLow = option.get("elementLow", 0)
         self.elementHigh = option.get("elementHigh", 100)
 
+        self.delimiter=option.get("delimiter",' ')
+
     def create(self):
         contain = set()
         for i in range(self.length):
@@ -50,7 +52,7 @@ class Sequence(DataType):
         ret = ""
         ret += str(len(self.element)) + "\n"
         for i in self.element:
-            ret += str(i) + ' '
+            ret += str(i) + self.delimiter
         return ret
 
 
@@ -215,13 +217,98 @@ class BipartiteGraph(Graph):
 
 
 class Query(DataType):
-    pass
+    def __init__(self,low,high,**option):
+        self.queryLow=low
+        self.queryHigh=high
+        self.query=randint(self.queryLow,self.queryHigh)
+
+        self.element=list()
+        self.isSort=option.get("isSort",False)
+        self.elementLow=option.get("elementLow",0)
+        self.elementHigh=option.get("elementHigh",100)
+        self.yLow=option.get("yLow",self.elementLow)
+        self.yHigh=option.get("yHigh",self.elementHigh)
+
+    def create(self):
+        for i in range(self.query):
+            x=randint(self.elementLow,self.elementHigh)
+            y=randint(self.yLow,self.yHigh)
+            self.element.append(QueryData(x,y))
+
+    def __str__(self):
+        self.create()
+        ret=""
+        ret+=str(len(self.element))+'\n'
+        for i in self.element:
+            ret+=str(i)+'\n'
+        return ret
+
 
 class String(DataType):
     pass
 
 class Coordinate(DataType):
-    pass
+    def __init__(self,low,high,**option):
+        self.pointLow=low
+        self.pointHigh=high
+        self.point=randint(self.pointLow,self.pointHigh)
+
+        self.element=list()
+        self.isRealNumber=option.get("isRealNumber",False)
+        self.floating=option.get("floating",3)
+        self.hasY=option.get("hasY",True)
+        self.hasZ=option.get("hasZ",False)
+        self.elementLow=option.get("elementLow",0)
+        self.elementHigh=option.get("elementHigh",100)
+        self.xLow=option.get("xLow",self.elementLow)
+        self.xHigh=option.get("xHigh",self.elementHigh)
+        self.yLow=option.get("yLow",self.elementLow)
+        self.yHigh=option.get("yHigh",self.elementHigh)
+        self.zLow=option.get("zLow",self.elementLow)
+        self.zHigh=option.get("zHigh",self.elementHigh)
+        self.djsjoint=option.get("disjoint",True)
+
+    def getRandPoint(self):
+        if not self.isRealNumber:
+            x = randint(self.xLow, self.xHigh)
+            y = randint(self.yLow, self.yHigh)
+            z = randint(self.zLow, self.zHigh)
+        else:
+            x = round(uniform(self.xLow, self.xHigh), self.floating)
+            y = round(uniform(self.yLow, self.yHigh), self.floating)
+            z = round(uniform(self.zLow, self.zHigh), self.floating)
+        if not self.hasY:
+            y = 0
+        if not self.hasZ:
+            z = 0
+        return Point(x,y,z)
+
+    def create(self):
+        contain=set()
+
+        for i in range(self.point):
+            p=self.getRandPoint()
+            while p in contain and self.djsjoint:
+                p=self.getRandPoint()
+            self.element.append(p)
+            contain.add(p)
+
+    def __str__(self):
+        self.create()
+        ret=""
+        ret+=str(len(self.element))
+        for i in self.element:
+            ret+=str(i.x)
+            if self.hasY:
+                ret+=' '+i.y
+            if self.hasZ:
+                ret+=' '+i.z
+            ret+='\n'
+        return ret
+
+
+
+
 
 class Grid(DataType):
     def __init__(self,low,high,**option):
@@ -232,7 +319,9 @@ class Grid(DataType):
 
         self.row=randint(self.rowLow,self.rowHigh)
         self.column=randint(self.columnLow,self.columnHigh)
-
+        self.same=option.get("same",True)
+        if self.same:
+            self.column=self.row
         self.element=list()
         self.lowercase=option.get("lowercase",False)
         self.uppercase=option.get("uppercase",False)
@@ -264,11 +353,11 @@ class Grid(DataType):
                     contain[ch] += 1
 
         if self.number:
-            for num in range(self.numberLow,self.columnHigh+1):
+            for num in range(self.numberLow,self.numberHigh+1):
                 if not str(num) in self.exclude:
                     self.element.append(str(num))
-                    if not ch in contain:
-                        contain[ch]=0
+                    if not str(num) in contain:
+                        contain[str(num)]=0
                     contain[str(num)]+=1
 
         for ch in self.include:
@@ -284,7 +373,7 @@ class Grid(DataType):
                         contain[ch] = 0
                     contain[ch]+=1
                     self.element.append(str(ch))
-
+        shuffle(self.element)
         self.grid=[["" for i in range(self.column)] for j in range(self.row)]
 
 
@@ -317,7 +406,10 @@ class Grid(DataType):
     def __str__(self):
         self.create()
         ret=""
-        ret+=str(self.row)+" "+str(self.column)+'\n'
+        ret+=str(self.row)
+        if not self.same:
+            ret+=' '+str(self.column)
+        ret+='\n'
         for r in self.grid:
             for c in r:
                 ret+=c+self.delimiter
@@ -333,7 +425,7 @@ class TestCase(DataType):
 
     def __str__(self):
         ret=str(self.testcase)+'\n'
-        for o in object:
+        for o in self.object:
             if ret[-1]!='\n':
                 ret+='\n'
             ret+=str(o)

@@ -36,3 +36,31 @@ class DisjointSet:
             self.tree[B] = A
         else:
             self.tree[A] = B
+
+
+class Point:
+    def __init__(self,x,y,z):
+        self.x=x
+        self.y=y
+        self.z=z
+
+    def __eq__(self, other):
+        return getattr(other,'x')==self.x and getattr(other,'y')==self.y and getattr(other,'z')==self.z
+
+    def __hash__(self):
+        return hash(str(self.x)+str(self.y)+str(self.z))
+
+
+class QueryData:
+    def __init__(self,x,y):
+        self.x=x
+        self.y=y
+
+    def __eq__(self, other):
+        return getattr(other,'x')==self.x and getattr(other,'y')==self.y
+
+    def __hash__(self):
+        return hash(str(self.x)+str(self.y))
+
+    def __str__(self):
+        return str(self.x)+' '+str(self.y)

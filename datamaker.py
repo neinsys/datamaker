@@ -2,6 +2,7 @@
 from datatype import *
 import os
 import shutil
+import copy
 
 
 
@@ -27,8 +28,8 @@ class DataMaker:
     def create(self,dataset):
         for i in range(len(dataset)):
             f = open(self.directory + "/" + self.name + str(i + self.startidx) + '.' + self.extension, "w")
-            f.write(str(self.Object(dataset[i][0], dataset[i][1],**dataset[i][2])))
-            print dataset[i][0],dataset[i][1]
+            f.write(str(self.Object(**dataset[i])))
+            print dataset[i]['low'],dataset[i]['high']
             f.close()
 
 class LinearDataMaker(DataMaker):
@@ -39,7 +40,9 @@ class LinearDataMaker(DataMaker):
         self.start=option.get("start",0)
         dataset=[]
         for i in range(testcase):
-            dataset.append([self.start+self.interval*i,self.start+self.interval*(i+1)-1,option])
+            option['low']=self.start+self.interval*i
+            option['high']=self.start+self.interval*(i+1)-1
+            dataset.append(copy.deepcopy(option))
         self.create(dataset)
 
 class GroupDataMaker(DataMaker):
@@ -48,9 +51,6 @@ class GroupDataMaker(DataMaker):
 
         dataset=[]
         for g in group:
-            low=g['nlow']
-            high=g['nhigh']
-            num=g['num']
-            for i in range(num):
-                dataset.append([low,high,g])
+            for i in range(g['num']):
+                dataset.append(g)
         self.create(dataset)
