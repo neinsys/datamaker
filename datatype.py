@@ -80,9 +80,20 @@ class Graph(DataType):
         self.edgeHigh = option.get("edgeHigh", self.vertex * (self.vertex - 1))
         if self.isConnected and self.edgeLow < self.vertex - 1:
             self.edgeLow = self.vertex - 1
+
+        if self.isUndirected and self.edgeLow > self.vertex * (self.vertex - 1) / 2 and self.disjoint:
+            self.edgeLow = self.vertex * (self.vertex - 1) / 2
         if self.isUndirected and self.edgeHigh > self.vertex * (self.vertex - 1) / 2 and self.disjoint:
             self.edgeHigh = self.vertex * (self.vertex - 1) / 2
 
+        if not self.isUndirected and self.edgeLow > self.vertex * (self.vertex - 1) and self.disjoint:
+            self.edgeLow = self.vertex * (self.vertex - 1)
+        if not self.isUndirected and self.edgeHigh > self.vertex * (self.vertex - 1) and self.disjoint:
+            self.edgeHigh = self.vertex * (self.vertex - 1)
+
+
+        if self.edgeLow>self.edgeHigh:
+            self.edgeHigh=self.edgeLow
         self.edge = randint(self.edgeLow, self.edgeHigh)
         self.edgeElement = []
 

@@ -12,6 +12,7 @@ class DataMaker:
         self.directory = option.get("directory", "input")
         self.name = option.get("name", "input")
         self.extension = option.get("extension", "in")
+        self.test = option.get("test",[])
         self.Object=Object
         self.option=option
 
@@ -26,10 +27,15 @@ class DataMaker:
         self.__init__(self,Object,**option)
 
     def create(self,dataset):
-        for i in range(len(dataset)):
+        for i,data in enumerate(dataset):
             f = open(self.directory + "/" + self.name + str(i + self.startidx) + '.' + self.extension, "w")
-            f.write(str(self.Object(**dataset[i])))
-            print dataset[i]['low'],dataset[i]['high']
+            objectData = self.Object(**data)
+            f.write(str(objectData))
+
+            for testFunc in self.test:
+                if not testFunc(objectData):
+                    print("warning : {}th dataset is fail of {} test".format(i, testFunc.__name__))
+            print("create {}th data".format(i))
             f.close()
 
 class LinearDataMaker(DataMaker):
