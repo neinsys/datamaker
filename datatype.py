@@ -19,27 +19,25 @@ class DataType:
 
 class Sequence(DataType):
 
-    def __init__(self, low, high, **option):
+    def __init__(self, Range, **option):
         self.isSort = option.get("isSort", False)
         self.compare = option.get("compare", None)
         self.disjoint = option.get("disjoint", False)
         self.exclude = option.get("exclude", set())
-        self.low = low
-        self.high = high
-        self.length = randint(low, high)
+        self.Range = Range
+        self.length = randint(self.Range[0], self.Range[1])
         self.element=[]
 
-        self.elementLow = option.get("elementLow", 0)
-        self.elementHigh = option.get("elementHigh", 100)
+        self.elementRange = option.get("elementRange", (0,100))
 
         self.delimiter=option.get("delimiter",' ')
 
     def create(self):
         contain = set()
-        for i in range(self.length):
-            num = randint(self.elementLow, self.elementHigh)
+        for i in Range(self.length):
+            num = randint(self.elementRange[0], self.elementRange[1])
             while (num in contain and self.disjoint) or num in self.exclude:
-                num = randint(self.elementLow, self.elementHigh)
+                num = randint(self.elementRange[0], self.elementRange[1])
             self.element.append(num)
             contain.add(num)
 
@@ -58,7 +56,7 @@ class Sequence(DataType):
 
 
 class Graph(DataType):
-    def __init__(self, low, high, **option):
+    def __init__(self, Range, **option):
         self.disjoint = option.get("disjoint", True)
         self.hasSelfEdge = option.get("hasSelfEdge", False)
         self.isSort = option.get("isSort", False)
@@ -66,35 +64,32 @@ class Graph(DataType):
         self.hasWeight = option.get("hasWeight", False)
         self.hasCost = option.get("hasCost", False)
 
-        self.weightLow = option.get("weightLow", 0)
-        self.weightHigh = option.get("weightHigh", 0)
+        self.weightRange = option.get("weightRange", (0,0))
 
-        self.costLow = option.get("costLow", 0)
-        self.costHigh = option.get("costHigh", 0)
+        self.costRange = option.get("costRange", (0,0))
 
         self.isConnected = option.get("isConnected", False)
         self.isUndirected = option.get("isUndirected", False)
         self.startVertex = option.get("startVertex", 1)
-        self.vertex = randint(low, high)
-        self.edgeLow = option.get("edgeLow", 0)
-        self.edgeHigh = option.get("edgeHigh", self.vertex * (self.vertex - 1))
-        if self.isConnected and self.edgeLow < self.vertex - 1:
-            self.edgeLow = self.vertex - 1
+        self.vertex = randint(Range[0], Range[1])
+        self.edgeRange = option.get("edgeRange", (0,self.vertex * (self.vertex - 1)))
+        if self.isConnected and self.edgeRange[0] < self.vertex - 1:
+            self.edgeRange[0] = self.vertex - 1
 
-        if self.isUndirected and self.edgeLow > self.vertex * (self.vertex - 1) / 2 and self.disjoint:
-            self.edgeLow = self.vertex * (self.vertex - 1) / 2
-        if self.isUndirected and self.edgeHigh > self.vertex * (self.vertex - 1) / 2 and self.disjoint:
-            self.edgeHigh = self.vertex * (self.vertex - 1) / 2
+        if self.isUndirected and self.edgeRange[0] > self.vertex * (self.vertex - 1) / 2 and self.disjoint:
+            self.edgeRange[0] = self.vertex * (self.vertex - 1) / 2
+        if self.isUndirected and self.edgeRange[1] > self.vertex * (self.vertex - 1) / 2 and self.disjoint:
+            self.edgeRange[1] = self.vertex * (self.vertex - 1) / 2
 
-        if not self.isUndirected and self.edgeLow > self.vertex * (self.vertex - 1) and self.disjoint:
-            self.edgeLow = self.vertex * (self.vertex - 1)
-        if not self.isUndirected and self.edgeHigh > self.vertex * (self.vertex - 1) and self.disjoint:
-            self.edgeHigh = self.vertex * (self.vertex - 1)
+        if not self.isUndirected and self.edgeRange[0] > self.vertex * (self.vertex - 1) and self.disjoint:
+            self.edgeRange[0] = self.vertex * (self.vertex - 1)
+        if not self.isUndirected and self.edgeRange[1] > self.vertex * (self.vertex - 1) and self.disjoint:
+            self.edgeRange[1] = self.vertex * (self.vertex - 1)
 
 
-        if self.edgeLow>self.edgeHigh:
-            self.edgeHigh=self.edgeLow
-        self.edge = randint(self.edgeLow, self.edgeHigh)
+        if self.edgeRange[0]>self.edgeRange[1]:
+            self.edgeRange[1]=self.edgeRange[0]
+        self.edge = randint(self.edgeRange[0], self.edgeRange[1])
         self.edgeElement = []
 
     def create(self):
@@ -105,8 +100,8 @@ class Graph(DataType):
         for i in range(self.edge):
             F = randint(self.startVertex, self.startVertex + self.vertex - 1)
             T = randint(self.startVertex, self.startVertex + self.vertex - 1)
-            W = randint(self.weightLow, self.weightHigh)
-            C = randint(self.costLow, self.costHigh)
+            W = randint(self.weightRange[0], self.weightRange[1])
+            C = randint(self.costRange[0], self.costRange[1])
 
             while (F == T and not self.hasSelfEdge) or \
                     (self.disjoint and Edge(F, T) in contain) or \
@@ -141,26 +136,23 @@ class Graph(DataType):
 
 
 class BipartiteGraph(Graph):
-    def __init__(self, aLow, aHigh, **option):
-        Graph.__init__(self, 0, 0, **option)
+    def __init__(self, aRange, **option):
+        Graph.__init__(self, (0, 0), **option)
         self.eachIdx = option.get("eachIdx", False)
         self.oneway = option.get("oneway", False)
         self.same = option.get("same", False)
 
-        self.aLow=aLow
-        self.aHigh=aHigh
-        self.bLow=option.get("bLow",aLow)
-        self.bHigh=option.get("bHigh",aHigh)
-        self.aVertex = randint(self.aLow, self.aHigh)
-        self.bVertex = randint(self.bLow, self.bHigh)
+        self.aRange=aRange
+        self.bRange=option.get("bRange",aRange)
+        self.aVertex = randint(self.aRange[0], self.aRange[1])
+        self.bVertex = randint(self.bRange[0], self.bRange)
         self.vertex = self.aVertex + self.bVertex
-        self.edgeLow = option.get("edgeLow", 0)
-        self.edgeHigh = option.get("edgeHigh", self.aVertex * self.bVertex * 2)
-        if self.isConnected and self.edgeLow < self.vertex - 1:
-            self.edgeLow = self.vertex - 1
-        if self.isUndirected and self.edgeHigh > self.aVertex * self.bVertex and self.disjoint:
-            self.edgeHigh = self.aVertex * self.bVertex
-        self.edge = randint(self.edgeLow, self.edgeHigh)
+        self.edgeRange = option.get("edgeRange", (0,self.aVertex * self.bVertex * 2))
+        if self.isConnected and self.edgeRange[0] < self.vertex - 1:
+            self.edgeRange[0] = self.vertex - 1
+        if self.isUndirected and self.edgeRange[1] > self.aVertex * self.bVertex and self.disjoint:
+            self.edgeRange[1] = self.aVertex * self.bVertex
+        self.edge = randint(self.edgeRange[0], self.edgeRange[1])
         self.A=[]
         self.B=[]
 
@@ -198,8 +190,8 @@ class BipartiteGraph(Graph):
         for i in range(self.edge):
             F = self.A[randint(0, self.aVertex - 1)]
             T = self.B[randint(0, self.bVertex - 1)]
-            W = randint(self.weightLow, self.weightHigh)
-            C = randint(self.costLow, self.costHigh)
+            W = randint(self.weightRange[0], self.weightRange[1])
+            C = randint(self.costRange[0], self.costRange[1])
             flag = randint(0, 1)
             if self.oneway:
                 flag = 0
@@ -228,22 +220,19 @@ class BipartiteGraph(Graph):
 
 
 class Query(DataType):
-    def __init__(self,low,high,**option):
-        self.queryLow=low
-        self.queryHigh=high
-        self.query=randint(self.queryLow,self.queryHigh)
+    def __init__(self,Range,**option):
+        self.queryRange = Range
+        self.query=randint(self.queryRange[0],self.queryRange[1])
 
         self.element=list()
         self.isSort=option.get("isSort",False)
-        self.elementLow=option.get("elementLow",0)
-        self.elementHigh=option.get("elementHigh",100)
-        self.yLow=option.get("yLow",self.elementLow)
-        self.yHigh=option.get("yHigh",self.elementHigh)
+        self.elementRange=option.get("elementRange",(0,100))
+        self.yRange=option.get("yRange",self.elementRange)
 
     def create(self):
         for i in range(self.query):
-            x=randint(self.elementLow,self.elementHigh)
-            y=randint(self.yLow,self.yHigh)
+            x=randint(self.elementRange[0],self.elementRange[1])
+            y=randint(self.yRange[0],self.yRange[1])
             self.element.append(QueryData(x,y))
 
     def __str__(self):
@@ -259,35 +248,30 @@ class String(DataType):
     pass
 
 class Coordinate(DataType):
-    def __init__(self,low,high,**option):
-        self.pointLow=low
-        self.pointHigh=high
-        self.point=randint(self.pointLow,self.pointHigh)
+    def __init__(self,Range,**option):
+        self.pointRange = Range
+        self.point=randint(self.pointRange[0],self.pointRange[1])
 
         self.element=list()
         self.isRealNumber=option.get("isRealNumber",False)
         self.floating=option.get("floating",3)
         self.hasY=option.get("hasY",True)
         self.hasZ=option.get("hasZ",False)
-        self.elementLow=option.get("elementLow",0)
-        self.elementHigh=option.get("elementHigh",100)
-        self.xLow=option.get("xLow",self.elementLow)
-        self.xHigh=option.get("xHigh",self.elementHigh)
-        self.yLow=option.get("yLow",self.elementLow)
-        self.yHigh=option.get("yHigh",self.elementHigh)
-        self.zLow=option.get("zLow",self.elementLow)
-        self.zHigh=option.get("zHigh",self.elementHigh)
-        self.djsjoint=option.get("disjoint",True)
+        self.elementRange=option.get("elementRange",(0,100))
+        self.xRange=option.get("xRange",self.elementRange)
+        self.yRange=option.get("yRange",self.elementRange)
+        self.zRange=option.get("zRange",self.elementRange)
+        self.disjoint=option.get("disjoint",True)
 
     def getRandPoint(self):
         if not self.isRealNumber:
-            x = randint(self.xLow, self.xHigh)
-            y = randint(self.yLow, self.yHigh)
-            z = randint(self.zLow, self.zHigh)
+            x = randint(self.xRange[0], self.xRange[1])
+            y = randint(self.yRange[0], self.yRange[1])
+            z = randint(self.zRange[0], self.zRange[1])
         else:
-            x = round(uniform(self.xLow, self.xHigh), self.floating)
-            y = round(uniform(self.yLow, self.yHigh), self.floating)
-            z = round(uniform(self.zLow, self.zHigh), self.floating)
+            x = round(uniform(self.xRange[0], self.xRange[1]), self.floating)
+            y = round(uniform(self.yRange[0], self.yRange[1]), self.floating)
+            z = round(uniform(self.zRange[0], self.zRange[1]), self.floating)
         if not self.hasY:
             y = 0
         if not self.hasZ:
@@ -299,7 +283,7 @@ class Coordinate(DataType):
 
         for i in range(self.point):
             p=self.getRandPoint()
-            while p in contain and self.djsjoint:
+            while p in contain and self.disjoint:
                 p=self.getRandPoint()
             self.element.append(p)
             contain.add(p)
@@ -322,14 +306,12 @@ class Coordinate(DataType):
 
 
 class Grid(DataType):
-    def __init__(self,low,high,**option):
-        self.rowLow=low
-        self.rowHigh=high
-        self.columnLow=option.get("columnLow",low)
-        self.columnHigh=option.get("columnHigh",high)
+    def __init__(self,Range,**option):
+        self.rowRange = Range
+        self.columnRange=option.get("columnRange",Range)
 
-        self.row=randint(self.rowLow,self.rowHigh)
-        self.column=randint(self.columnLow,self.columnHigh)
+        self.row=randint(self.rowRange[0],self.rowRange[1])
+        self.column=randint(self.columnRange[0],self.columnRange[1])
         self.same=option.get("same",True)
         if self.same:
             self.column=self.row
@@ -337,8 +319,7 @@ class Grid(DataType):
         self.lowercase=option.get("lowercase",False)
         self.uppercase=option.get("uppercase",False)
         self.number=option.get("number",False)
-        self.numberLow=option.get("numberLow",0)
-        self.numberHigh=option.get("numberHigh",100)
+        self.numberRange=option.get("numberRange",(0,100))
         self.include=option.get("include",[])
         self.exclude=option.get("exclude",set())
         self.unique=option.get("unique",set())
@@ -364,7 +345,7 @@ class Grid(DataType):
                     contain[ch] += 1
 
         if self.number:
-            for num in range(self.numberLow,self.numberHigh+1):
+            for num in range(self.numberRange[0],self.numberRange[1]+1):
                 if not str(num) in self.exclude:
                     self.element.append(str(num))
                     if not str(num) in contain:
@@ -429,10 +410,10 @@ class Grid(DataType):
 
 class TestCase(DataType):
     objects=[]
-    def __init__(self,low,high,object,**option):
+    def __init__(self,Range,object,**option):
         self.testcase=option.get("testcase",1)
-        for tc in range(self.testcase):
-            self.objects.append(object(low,high,**option))
+        for tc in Range(self.testcase):
+            self.objects.append(object(Range,**option))
 
     def __str__(self):
         ret=str(self.testcase)+'\n'

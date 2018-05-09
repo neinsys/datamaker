@@ -12,7 +12,7 @@ class DataMaker:
         self.directory = option.get("directory", "input")
         self.name = option.get("name", "input")
         self.extension = option.get("extension", "in")
-        self.test = option.get("test",[])
+        self.assertion = option.get("assertion",[])
         self.Object=Object
         self.option=option
 
@@ -32,9 +32,9 @@ class DataMaker:
             objectData = self.Object(**data)
             f.write(str(objectData))
 
-            for testFunc in self.test:
-                if not testFunc(objectData):
-                    print("warning : {}th dataset is fail of {} test".format(i, testFunc.__name__))
+            for assertFunc in self.assertion:
+                if not assertFunc(objectData):
+                    print("warning : {}th dataset is fail of {} test".format(i, assertFunc.__name__))
             print("create {}th data".format(i))
             f.close()
 
@@ -46,8 +46,7 @@ class LinearDataMaker(DataMaker):
         self.start=option.get("start",0)
         dataset=[]
         for i in range(testcase):
-            option['low']=self.start+self.interval*i
-            option['high']=self.start+self.interval*(i+1)-1
+            option['range']=(self.start+self.interval*i,self.start+self.interval*(i+1)-1)
             dataset.append(copy.deepcopy(option))
         self.create(dataset)
 
