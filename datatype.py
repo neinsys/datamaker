@@ -28,7 +28,7 @@ class Sequence(DataType):
         self.length = randint(self.Range[0], self.Range[1])
         self.element=[]
 
-        self.elementRange = option.get("elementRange", (0,100))
+        self.elementRange = option.get("elementRange", [0,100])
 
         self.delimiter=option.get("delimiter",' ')
 
@@ -64,15 +64,15 @@ class Graph(DataType):
         self.hasWeight = option.get("hasWeight", False)
         self.hasCost = option.get("hasCost", False)
 
-        self.weightRange = option.get("weightRange", (0,0))
+        self.weightRange = option.get("weightRange", [0,0])
 
-        self.costRange = option.get("costRange", (0,0))
+        self.costRange = option.get("costRange", [0,0])
 
         self.isConnected = option.get("isConnected", False)
         self.isUndirected = option.get("isUndirected", False)
         self.startVertex = option.get("startVertex", 1)
         self.vertex = randint(Range[0], Range[1])
-        self.edgeRange = option.get("edgeRange", (0,self.vertex * (self.vertex - 1)))
+        self.edgeRange = option.get("edgeRange", [0,self.vertex * (self.vertex - 1)])
         if self.isConnected and self.edgeRange[0] < self.vertex - 1:
             self.edgeRange[0] = self.vertex - 1
 
@@ -137,7 +137,7 @@ class Graph(DataType):
 
 class BipartiteGraph(Graph):
     def __init__(self, aRange, **option):
-        Graph.__init__(self, (0, 0), **option)
+        Graph.__init__(self, [0,0], **option)
         self.eachIdx = option.get("eachIdx", False)
         self.oneway = option.get("oneway", False)
         self.same = option.get("same", False)
@@ -145,9 +145,9 @@ class BipartiteGraph(Graph):
         self.aRange=aRange
         self.bRange=option.get("bRange",aRange)
         self.aVertex = randint(self.aRange[0], self.aRange[1])
-        self.bVertex = randint(self.bRange[0], self.bRange)
+        self.bVertex = randint(self.bRange[0], self.bRange[1])
         self.vertex = self.aVertex + self.bVertex
-        self.edgeRange = option.get("edgeRange", (0,self.aVertex * self.bVertex * 2))
+        self.edgeRange = option.get("edgeRange", [0,self.aVertex * self.bVertex * 2])
         if self.isConnected and self.edgeRange[0] < self.vertex - 1:
             self.edgeRange[0] = self.vertex - 1
         if self.isUndirected and self.edgeRange[1] > self.aVertex * self.bVertex and self.disjoint:
@@ -226,7 +226,7 @@ class Query(DataType):
 
         self.element=list()
         self.isSort=option.get("isSort",False)
-        self.elementRange=option.get("elementRange",(0,100))
+        self.elementRange=option.get("elementRange",[0,100])
         self.yRange=option.get("yRange",self.elementRange)
 
     def create(self):
@@ -257,7 +257,7 @@ class Coordinate(DataType):
         self.floating=option.get("floating",3)
         self.hasY=option.get("hasY",True)
         self.hasZ=option.get("hasZ",False)
-        self.elementRange=option.get("elementRange",(0,100))
+        self.elementRange=option.get("elementRange",[0,100])
         self.xRange=option.get("xRange",self.elementRange)
         self.yRange=option.get("yRange",self.elementRange)
         self.zRange=option.get("zRange",self.elementRange)
@@ -319,7 +319,7 @@ class Grid(DataType):
         self.lowercase=option.get("lowercase",False)
         self.uppercase=option.get("uppercase",False)
         self.number=option.get("number",False)
-        self.numberRange=option.get("numberRange",(0,100))
+        self.numberRange=option.get("numberRange",[0,100])
         self.include=option.get("include",[])
         self.exclude=option.get("exclude",set())
         self.unique=option.get("unique",set())
